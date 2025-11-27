@@ -114,7 +114,34 @@
     <!-- Script de Lógica -->
     <script>
         // --- Estado ---
-        let alarms = JSON.parse(localStorage.getItem('myTimers')) || [];
+        // Comprobamos si hay datos en localStorage
+        let alarms;
+        const storedData = localStorage.getItem('myTimers');
+
+        if (storedData) {
+            // Si existen datos previos, los cargamos
+            alarms = JSON.parse(storedData);
+        } else {
+            // Si NO existen datos (primera visita), cargamos los predefinidos
+            alarms = [
+                {
+                    id: Date.now(),
+                    name: "Trabajar",
+                    time: "08:15",
+                    days: [1, 2, 3, 4, 5], // Lunes a Viernes
+                    createdAt: new Date()
+                },
+                {
+                    id: Date.now() + 1, // ID ligeramente distinto
+                    name: "Las ocho",
+                    time: "20:00",
+                    days: [0, 1, 2, 3, 4, 5, 6], // Todos los días (0-6)
+                    createdAt: new Date()
+                }
+            ];
+            // Guardamos estos valores iniciales en localStorage para persistencia futura
+            localStorage.setItem('myTimers', JSON.stringify(alarms));
+        }
 
         // --- Referencias DOM ---
         const form = document.getElementById('alarmForm');
