@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Temporizadores</title>
+    <!-- Tailwind CSS para estilos rápidos y modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Animación suave para los números */
+        .countdown-item {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .day-checkbox:checked + div {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+    <div class="max-w-4xl mx-auto p-4 md:p-8">
+        <!-- Encabezado -->
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-blue-600 mb-2"><i class="fa-solid fa-clock rotate-n-12"></i> Cronos</h1>
+            <p class="text-gray-500">Gestiona tus tiempos restantes para eventos recurrentes.</p>
+        </header>
+
+        <!-- Formulario para añadir -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-blue-500"></i> Nuevo Temporizador
+            </h2>
+            
+            <form id="alarmForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Nombre -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del evento</label>
+                        <input type="text" id="nameInput" placeholder="Ej: Entrar a trabajar" required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+                    <!-- Hora -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Hora Objetivo</label>
+                        <input type="time" id="timeInput" required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+                </div>
+
+                <!-- Selección de días -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Días activos</label>
+                    <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                        <!-- Generados con JS o HTML estático, usaremos HTML para claridad -->
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="days" value="1" class="day-checkbox hidden" checked>
+                            <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold transition hover:bg-blue-50 select-none">L</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="days" value="2" class="day-checkbox hidden" checked>
+                            <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold transition hover:bg-blue-50 select-none">M</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="days" value="3" class="day-checkbox hidden" checked>
+                            <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold transition hover:bg-blue-50 select-none">X</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="days" value="4" class="day-checkbox hidden" checked>
+                            <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold transition hover:bg-blue-50 select-none">J</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="days" value="5" class="day-checkbox hidden" checked>
+                            <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold transition hover:bg-blue-50 select-none">V</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="days" value="6" class="day-checkbox hidden">
+                            <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold transition hover:bg-blue-50 select-none text-red-400">S</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="days" value="0" class="day-checkbox hidden">
+                            <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold transition hover:bg-blue-50 select-none text-red-400">D</div>
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">* L = Lunes, D = Domingo</p>
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition transform hover:scale-[1.01]">
+                    <i class="fa-solid fa-save mr-2"></i> Guardar Temporizador
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista de Temporizadores -->
+        <div id="timersList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Aquí se inyectan los temporizadores con JS -->
+        </div>
+        
+        <div id="emptyState" class="hidden text-center py-12 text-gray-400">
+            <i class="fa-regular fa-calendar-times text-6xl mb-4"></i>
+            <p class="text-lg">No tienes temporizadores activos.</p>
+        </div>
+
+    </div>
+
+    <!-- Script de Lógica -->
+    <script>
+        // --- Estado ---
+        let alarms = JSON.parse(localStorage.getItem('myTimers')) || [];
+
+        // --- Referencias DOM ---
+        const form = document.getElementById('alarmForm');
+        const timersList = document.getElementById('timersList');
+        const emptyState = document.getElementById('emptyState');
+
+        // --- Funciones Principales ---
+
+        // 1. Guardar y Renderizar
+        function saveAndRender() {
+            localStorage.setItem('myTimers', JSON.stringify(alarms));
+            renderAlarms();
+        }
+
+        // 2. Añadir Alarma
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('nameInput').value;
+            const time = document.getElementById('timeInput').value; // Formato "HH:MM"
+            
+            // Obtener días seleccionados (array de números 0-6)
+            const checkboxes = document.querySelectorAll('input[name="days"]:checked');
+            const days = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+            if (days.length === 0) {
+                alert("Por favor selecciona al menos un día de la semana.");
+                return;
+            }
+
+            const newAlarm = {
+                id: Date.now(),
+                name,
+                time,
+                days,
+                createdAt: new Date()
+            };
+
+            alarms.push(newAlarm);
+            saveAndRender();
+            form.reset();
+            
+            // Resetear visualmente los checkboxes a defecto (L-V)
+            document.querySelectorAll('input[name="days"]').forEach(cb => {
+                const val = parseInt(cb.value);
+                cb.checked = (val >= 1 && val <= 5);
+            });
+        });
+
+        // 3. Borrar Alarma
+        window.deleteAlarm = (id) => {
+            if(confirm('¿Borrar este temporizador?')) {
+                alarms = alarms.filter(a => a.id !== id);
+                saveAndRender();
+            }
+        };
+
+        // 4. Calcular siguiente ocurrencia
+        function getNextOccurrence(timeStr, activeDays) {
+            const now = new Date();
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            
+            // Creamos una fecha candidata para "hoy" a la hora objetivo
+            let candidate = new Date();
+            candidate.setHours(hours, minutes, 0, 0);
+
+            // Si la hora ya pasó hoy, empezamos a buscar desde mañana
+            if (candidate <= now) {
+                candidate.setDate(candidate.getDate() + 1);
+            }
+
+            // Buscamos el siguiente día activo
+            // Límite de seguridad de 8 días (aunque en teoría con 7 basta)
+            for (let i = 0; i < 8; i++) {
+                const dayOfWeek = candidate.getDay(); // 0 = Domingo, 1 = Lunes...
+                
+                if (activeDays.includes(dayOfWeek)) {
+                    return candidate;
+                }
+                
+                // Si hoy no es activo, sumamos un día y mantenemos la hora
+                candidate.setDate(candidate.getDate() + 1);
+            }
+            return null; // No debería pasar si hay al menos un día seleccionado
+        }
+
+        // 5. Formatear tiempo restante
+        function getTimeRemaining(endTime) {
+            const total = Date.parse(endTime) - Date.parse(new Date());
+            
+            if (total <= 0) return { total, hours: 0, minutes: 0, seconds: 0 };
+
+            const seconds = Math.floor((total / 1000) % 60);
+            const minutes = Math.floor((total / 1000 / 60) % 60);
+            const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+            const days = Math.floor(total / (1000 * 60 * 60 * 24));
+
+            return { total, days, hours, minutes, seconds };
+        }
+
+        // 6. Renderizar UI
+        function renderAlarms() {
+            timersList.innerHTML = '';
+            
+            if (alarms.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            alarms.forEach(alarm => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow p-5 border-l-4 border-blue-500 relative flex flex-col justify-between h-48 transition hover:shadow-lg';
+                
+                // Generar HTML de los días pequeñitos
+                const daysMap = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+                let daysHtml = '';
+                daysMap.forEach((d, index) => {
+                    const isActive = alarm.days.includes(index);
+                    const colorClass = isActive ? 'text-blue-600 font-bold' : 'text-gray-300';
+                    daysHtml += `<span class="${colorClass} text-xs mx-0.5">${d}</span>`;
+                });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800 leading-tight">${alarm.name}</h3>
+                            <div class="text-sm text-gray-500 mt-1 flex items-center">
+                                <i class="fa-regular fa-clock mr-1"></i> ${alarm.time}
+                            </div>
+                        </div>
+                        <button onclick="deleteAlarm(${alarm.id})" class="text-gray-400 hover:text-red-500 transition p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <div class="text-center my-2">
+                        <div class="text-4xl font-bold text-blue-600 tracking-wider font-mono countdown-display" id="timer-${alarm.id}">
+                            --:--:--
+                        </div>
+                        <div class="text-xs text-gray-400 uppercase mt-1" id="label-${alarm.id}">Calculando...</div>
+                    </div>
+
+                    <div class="mt-auto border-t pt-2 flex justify-between items-center">
+                        <div class="flex">${daysHtml}</div>
+                    </div>
+                `;
+                timersList.appendChild(card);
+            });
+            
+            // Actualizar inmediatamente
+            updateTimers();
+        }
+
+        // 7. Bucle de actualización (cada segundo)
+        function updateTimers() {
+            alarms.forEach(alarm => {
+                const displayEl = document.getElementById(`timer-${alarm.id}`);
+                const labelEl = document.getElementById(`label-${alarm.id}`);
+                if (!displayEl) return;
+
+                const nextDate = getNextOccurrence(alarm.time, alarm.days);
+                
+                if (!nextDate) {
+                    displayEl.innerText = "Inactivo";
+                    return;
+                }
+
+                const t = getTimeRemaining(nextDate);
+
+                // Formateo con ceros a la izquierda
+                const h = (t.hours + (t.days * 24)).toString().padStart(2, '0'); // Sumamos días a las horas si falta mucho
+                const m = t.minutes.toString().padStart(2, '0');
+                const s = t.seconds.toString().padStart(2, '0');
+
+                if (t.days > 0) {
+                     // Si falta más de un día, mostramos Días + Horas
+                     displayEl.innerText = `${t.days}d ${t.hours}h ${m}m`;
+                     labelEl.innerText = "Falta mucho";
+                } else {
+                    // Formato clásico HH:MM:SS
+                    displayEl.innerText = `${h}:${m}:${s}`;
+                    
+                    if (h === "00" && m < 30) {
+                        displayEl.classList.add('text-red-500'); // Poner rojo si falta poco
+                        displayEl.classList.remove('text-blue-600');
+                        labelEl.innerText = "¡Ya casi!";
+                        labelEl.classList.add('text-red-400');
+                    } else {
+                        displayEl.classList.remove('text-red-500');
+                        displayEl.classList.add('text-blue-600');
+                         // Determinar si es hoy o mañana para el texto
+                        const isToday = nextDate.getDate() === new Date().getDate();
+                        labelEl.innerText = isToday ? "Para hoy" : `Para el ${getDayName(nextDate.getDay())}`;
+                        labelEl.classList.remove('text-red-400');
+                    }
+                }
+            });
+        }
+
+        function getDayName(dayIndex) {
+            const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            return days[dayIndex];
+        }
+
+        // Inicializar
+        renderAlarms();
+        setInterval(updateTimers, 1000);
+
+    </script>
+</body>
+</html>
